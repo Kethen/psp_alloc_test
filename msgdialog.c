@@ -301,7 +301,7 @@ int msgdialog_main()
 	else
 		sprintf(button, "Back");
 
-    ShowErrorDialog(0xaaaaaaaa);
+    ShowErrorDialog(0x80020001);
 	
 	sprintf(string, "This is a utility message dialog.\nAfter you acknowledge it, this program will\nautomatically exit to the shell.\n\nBy the way, you selected '%s' on the first dialog.", button);
 
