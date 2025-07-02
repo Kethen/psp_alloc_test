@@ -1,0 +1,34 @@
+name: Build package
+
+on: [ push, pull_request, workflow_dispatch ]
+
+jobs:
+  build_pkg:
+    runs-on: ubuntu-24.04
+    steps:
+
+    - name: Checkout
+      uses: actions/checkout@v3
+
+      # install latest pspdev sdk
+    - name: Download PSP SDK
+      run: |
+        curl -sL https://github.com/pspdev/pspdev/releases/download/v20250601/pspdev-ubuntu-latest-x86_64.tar.gz | tar xvz -C ./
+
+    - name: Set env vars
+      run: |
+        echo "sha_name=$(echo ${GITHUB_SHA} | cut -c1-8)" >> $GITHUB_ENV
+        echo "PSPDEV=${GITHUB_WORKSPACE}/pspdev" >> $GITHUB_ENV
+        echo "${GITHUB_WORKSPACE}/pspdev/bin" >> $GITHUB_PATH
+
+    - name: Build
+      run: |
+        make
+
+    - name: Push package artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: landmine_${{ env.sha_name }}
+        path: |
+           EBOOT.PBP
+        if-no-files-found: error
