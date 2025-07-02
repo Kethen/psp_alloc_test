@@ -1,5 +1,5 @@
 TARGET = cube
-OBJS = cube.o logo.o common/callbacks.o polyphonic.o
+OBJS = cube.o logo.o common/callbacks.o polyphonic.o msgdialog.o
 
 INCDIR =
 CFLAGS = -Wall -O0

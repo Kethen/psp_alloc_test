@@ -23,7 +23,7 @@
 void dump_threadstatus(void);
 
 /* Exit callback */
-int exit_callback(int arg1, int arg2, void *common)
+static int exit_callback(int arg1, int arg2, void *common)
 {
 	sceKernelExitGame();
 
@@ -31,7 +31,7 @@ int exit_callback(int arg1, int arg2, void *common)
 }
 
 /* Callback thread */
-int CallbackThread(SceSize args, void *argp)
+static int CallbackThread(SceSize args, void *argp)
 {
 	int cbid;
 
@@ -44,7 +44,7 @@ int CallbackThread(SceSize args, void *argp)
 }
 
 /* Sets up the callback thread and returns its thread id */
-int SetupCallbacks(void)
+static int SetupCallbacks(void)
 {
 	int thid = 0;
 

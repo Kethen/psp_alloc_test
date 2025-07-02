@@ -34,7 +34,7 @@ struct Vertex
 	float x,y,z;
 };
 
-struct Vertex __attribute__((aligned(16))) vertices[12*3] =
+static struct Vertex __attribute__((aligned(16))) vertices[12*3] =
 {
 	{0, 0, 0xff7f0000,-1,-1, 1}, // 0
 	{1, 0, 0xff7f0000,-1, 1, 1}, // 4
@@ -116,7 +116,7 @@ int log_fd = -1;
 	LOG_SCREEN(__VA_ARGS__); \
 }
 
-static void print_status(){
+void print_status(){
 	pspDebugScreenSetXY(0, 0);
 	pspDebugScreenPrintf("%s", status);
 }
@@ -193,10 +193,18 @@ static void allocate_blocks(){
 	}
 }
 
+static void dealloc_blocks(){
+	for (int i = 0;i > num_blocks;i++){
+		sceKernelFreePartitionMemory(blocks[i].id);
+	}
+}
+
 int polyphonic_main();
 int audio_thread(unsigned int args, void *argp){
 	polyphonic_main();
 }
+
+int test_done = 0;
 
 int memtest_thread(unsigned int args, void *argp){
 	sceKernelDelayThread(1000000 * 2);
@@ -206,14 +214,16 @@ int memtest_thread(unsigned int args, void *argp){
 	sceKernelDelayThread(1000000 * 2);
 	read_blocks();
 	sceKernelDelayThread(1000000 * 2);
-	LOG_BOTH("%s: test finished\n", __func__);
+	LOG_BOTH("%s: test finished, moving onto dialog test\n", __func__);
+	test_done = 1;
+	dealloc_blocks();
 	return 0;
 }
 
+int msgdialog_main();
+
 int main(int argc, char* argv[])
 {
-
-
 	setupCallbacks();
 
 	// setup GU
@@ -270,7 +280,7 @@ int main(int argc, char* argv[])
 		sceKernelStartThread(tid, 0, NULL);	
 	}
 
-	while(running())
+	while(running() && !test_done)
 	{
 		sceGuStart(GU_DIRECT,list);
 
@@ -324,6 +334,8 @@ int main(int argc, char* argv[])
 
 		val++;
 	}
+
+	msgdialog_main();
 
 	sceGuTerm();
 
