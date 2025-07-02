@@ -214,7 +214,7 @@ int memtest_thread(unsigned int args, void *argp){
 	sceKernelDelayThread(1000000 * 2);
 	read_blocks();
 	sceKernelDelayThread(1000000 * 2);
-	LOG_BOTH("%s: test finished, moving onto dialog test\n", __func__);
+	LOG_BOTH("%s: test finished\n", __func__);
 	test_done = 1;
 	dealloc_blocks();
 	return 0;
@@ -333,6 +333,17 @@ int main(int argc, char* argv[])
 		sceGuSwapBuffers();
 
 		val++;
+	}
+
+	LOG_BOTH("%s: testing one more time with dialog box active\n", __func__);
+
+	// memalloc test again while dialog is running
+	sceKernelDeleteThread(tid);
+	tid = sceKernelCreateThread("tester", memtest_thread, 0x18, 0x1000, 0, NULL);
+	if (tid < 0){
+		LOG_BOTH("%s: failed creating tester thread\n", __func__);
+	}else{
+		sceKernelStartThread(tid, 0, NULL);
 	}
 
 	msgdialog_main();
