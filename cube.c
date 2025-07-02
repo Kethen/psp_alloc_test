@@ -161,7 +161,7 @@ static void read_blocks(){
 				num_error_addr++;
 			}
 		}
-		LOG_BOTH("%s: done reading allocated blocks, errors %d\n", __func__, num_error_addr);
+		LOG_BOTH("%s: done reading allocated bytes, errors %d\n", __func__, num_error_addr);
 	}
 }
 
