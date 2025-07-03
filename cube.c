@@ -174,8 +174,9 @@ static void write_blocks(){
 }
 
 static void allocate_blocks(){
-	num_blocks = 0;
-
+	if (num_blocks != 0){
+		return;
+	}
 	while(1){
 		int max_free = sceKernelMaxFreeMemSize();
 		if (max_free == 0){
@@ -199,6 +200,7 @@ static void dealloc_blocks(){
 	for (int i = 0;i > num_blocks;i++){
 		sceKernelFreePartitionMemory(blocks[i].id);
 	}
+	num_blocks = 0;
 }
 
 int polyphonic_main();
@@ -209,6 +211,8 @@ int audio_thread(unsigned int args, void *argp){
 int test_done = 0;
 
 int memtest_thread(unsigned int args, void *argp){
+	test_done = 0;
+
 	sceKernelDelayThread(1000000 * 2);
 
 	allocate_blocks();
@@ -218,8 +222,8 @@ int memtest_thread(unsigned int args, void *argp){
 	read_blocks();
 	sceKernelDelayThread(1000000 * 2);
 	LOG_BOTH("%s: test finished\n", __func__);
+	//dealloc_blocks();
 	test_done = 1;
-	dealloc_blocks();
 
 	return 0;
 }
@@ -243,6 +247,10 @@ int msgdialog_main();
 
 int main(int argc, char* argv[])
 {
+	log_fd = sceIoOpen("ms0:/landmine.log", PSP_O_CREAT | PSP_O_TRUNC | PSP_O_WRONLY, 0777); \
+
+	protect_memory();
+
 	setupCallbacks();
 
 	// setup GU
@@ -279,10 +287,6 @@ int main(int argc, char* argv[])
 
 	int val = 0;	
 
-	log_fd = sceIoOpen("ms0:/landmine.log", PSP_O_CREAT | PSP_O_TRUNC | PSP_O_WRONLY, 0777); \
-
-	protect_memory();
-
 	// play some audio
 	int tid = sceKernelCreateThread("audio", audio_thread, 0x18, 0x1000, PSP_THREAD_ATTR_VFPU, NULL);
 	if (tid < 0){
@@ -299,7 +303,7 @@ int main(int argc, char* argv[])
 		sceKernelStartThread(tid, 0, NULL);	
 	}
 
-	while(running() && !test_done)
+	while(!test_done)
 	{
 		sceGuStart(GU_DIRECT,list);
 

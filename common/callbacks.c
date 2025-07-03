@@ -25,7 +25,8 @@ int running()
 
 int exitCallback(int arg1, int arg2, void *common)
 {
-	exitRequest = 1;
+	sceKernelExitGame();
+	//exitRequest = 1;
 	return 0;
 }
 
