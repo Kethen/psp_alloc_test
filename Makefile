@@ -13,8 +13,12 @@ LIBS= -lpspgum -lpspgu -lpspaudiolib -lpspaudio
 EXTRA_TARGETS = EBOOT.PBP
 PSP_EBOOT_TITLE = LANDMINE
 
+# let CFW decide this
+PSP_LARGE_MEMORY = 0
+
 PSPSDK=$(shell psp-config --pspsdk-path)
 include $(PSPSDK)/lib/build.mak
+
 
 logo.o: logo.raw
 	bin2o -i logo.raw logo.o logo
