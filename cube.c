@@ -359,7 +359,7 @@ static void generate_dummy_file(){
 		LOG_BOTH("%s: failed opening file for writing, 0x%x\n", __func__, fd);
 		return;
 	}
-	char write_buf[1024] = {0};
+	char write_buf[1024 * 8] = {0};
 	memset(write_buf, 0xaa, sizeof(write_buf));
 	for(int i = 0;i < 10;i++){
 		int write_status = sceIoWrite(fd, write_buf, sizeof(write_buf));
@@ -379,7 +379,7 @@ static void read_dummy_file(){
 		LOG_FILE("%s: failed opening file for reading, 0x%x\n", __func__, fd);
 		return;
 	}
-	uint32_t read_buf[1024 / sizeof(uint32_t)] = {0};
+	uint32_t read_buf[1024 * 8 / sizeof(uint32_t)] = {0};
 	for(int i = 0;i < 10;i++){
 		int read_status = sceIoRead(fd, read_buf, sizeof(read_buf));
 		if (read_status != sizeof(read_buf)){
