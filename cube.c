@@ -138,6 +138,8 @@ static void read_blocks(){
 		int num_error_addr = 0;;
 		int last_j = 0;
 
+		sceKernelDcacheInvalidateRange(blocks[i].start_addr, blocks[i].size);
+
 		for(int j = 0;j < blocks[i].size;j++){
 			if (j - last_j > 256 * 1024){
 				LOG_SCREEN("%d/%d", j, blocks[i].size);
@@ -162,6 +164,11 @@ static void read_blocks(){
 			}
 		}
 		LOG_BOTH("%s: done reading allocated bytes, errors %d\n", __func__, num_error_addr);
+
+		if (num_error_addr != 0){
+			sceKernelDelayThread(1000000 * 5);
+			sceKernelExitGame();
+		}
 	}
 }
 
