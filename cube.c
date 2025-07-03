@@ -230,6 +230,7 @@ int memtest_thread(unsigned int args, void *argp){
 
 void protect_memory(){
 	// test your memory protection here
+	#if 0
 	int uid_f0 = sceKernelAllocPartitionMemory(2, "SCE_PSPEMU_FLASHFS", PSP_SMEM_Addr, 0x20000, (void*)0x0B000000);
 	int uid_scratch = sceKernelAllocPartitionMemory(2, "SCE_PSPEMU_SCRATCHPAD", PSP_SMEM_Addr, 0x30000, (void*)0x0BD00000);
 
@@ -241,6 +242,7 @@ void protect_memory(){
 	}
 
 	LOG_BOTH("%s: memory protection allocated\n", __func__);
+	#endif
 }
 
 int msgdialog_main();
