@@ -174,6 +174,8 @@ static void write_blocks(){
 }
 
 static void allocate_blocks(){
+	num_blocks = 0;
+
 	while(1){
 		int max_free = sceKernelMaxFreeMemSize();
 		if (max_free == 0){
@@ -208,6 +210,7 @@ int test_done = 0;
 
 int memtest_thread(unsigned int args, void *argp){
 	sceKernelDelayThread(1000000 * 2);
+
 	allocate_blocks();
 	sceKernelDelayThread(1000000 * 2);
 	write_blocks();
@@ -217,7 +220,23 @@ int memtest_thread(unsigned int args, void *argp){
 	LOG_BOTH("%s: test finished\n", __func__);
 	test_done = 1;
 	dealloc_blocks();
+
 	return 0;
+}
+
+void protect_memory(){
+	// test your memory protection here
+	int uid_f0 = sceKernelAllocPartitionMemory(2, "SCE_PSPEMU_FLASHFS", PSP_SMEM_Addr, 0x20000, (void*)0x0B000000);
+	int uid_scratch = sceKernelAllocPartitionMemory(2, "SCE_PSPEMU_SCRATCHPAD", PSP_SMEM_Addr, 0x30000, (void*)0x0BD00000);
+
+	if (uid_f0 < 0){
+		LOG_BOTH("%s: failed protecting flashfs, 0x%x\n", __func__, uid_f0);
+	}
+	if (uid_scratch < 0){
+		LOG_BOTH("%s: failed protecting scratch pad, 0x%x\n", __func__, uid_scratch);
+	}
+
+	LOG_BOTH("%s: memory protection allocated\n", __func__);
 }
 
 int msgdialog_main();
@@ -258,11 +277,11 @@ int main(int argc, char* argv[])
 	sceDisplayWaitVblankStart();
 	sceGuDisplay(GU_TRUE);
 
-	// run sample
-
 	int val = 0;	
 
 	log_fd = sceIoOpen("ms0:/landmine.log", PSP_O_CREAT | PSP_O_TRUNC | PSP_O_WRONLY, 0777); \
+
+	protect_memory();
 
 	// play some audio
 	int tid = sceKernelCreateThread("audio", audio_thread, 0x18, 0x1000, PSP_THREAD_ATTR_VFPU, NULL);
